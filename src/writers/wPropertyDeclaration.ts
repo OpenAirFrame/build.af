@@ -1,6 +1,6 @@
-import { ClassInstancePropertyTypes, ts } from "ts-morph";
+import { ClassInstancePropertyTypes, ParameterDeclaration } from "ts-morph";
 import Context from "../context";
-
+import { printNode } from "../printer";
 /*
   Apex Docs
 
@@ -50,9 +50,10 @@ import Context from "../context";
 
 */
 export default function writePropertyDeclaration(
-  member: ClassInstancePropertyTypes,
+  _member: ClassInstancePropertyTypes,
   context: Context
 ): string {
+  let member = _member as ParameterDeclaration;
   let apexCode = "";
 
   // if (member.getKindName() == "PropertyDeclaration") {
@@ -64,6 +65,7 @@ export default function writePropertyDeclaration(
   let isReadonly = false;
   let type = member.getType().getText();
   let name = member.getName();
+  let initialValue = null;
 
   member.getModifiers().forEach((modifier) => {
     const modifierName = modifier.getText().toLowerCase();
@@ -88,18 +90,26 @@ export default function writePropertyDeclaration(
     }
   });
 
+  // Get initial value if it is set
+  const initializer = member.getInitializer();
+  if (initializer) {
+    // TODO: Parse the initializer
+    initialValue = printNode(initializer, context);
+  }
+
   apexCode += scope;
   apexCode += " " + getApexType(type);
+  apexCode += isReadonly ? " final" : "";
+  apexCode += isStatic ? " static" : "";
+  apexCode += " " + name;
 
-  if (isReadonly) {
-    apexCode += " final";
+  // Apex defaults to a null value for class properties
+  if (initialValue !== null) {
+    apexCode += " = ";
+    apexCode += initialValue;
   }
 
-  if (isStatic) {
-    apexCode += " static";
-  }
-
-  apexCode += " " + name + ";";
+  apexCode += ";";
 
   return apexCode;
 }

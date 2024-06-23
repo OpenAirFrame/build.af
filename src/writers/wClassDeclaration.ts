@@ -48,9 +48,9 @@ import writePropertyDeclaration from "./wPropertyDeclaration";
       @TestVisible
 */
 
-export default function writeClassDeclaration(node: Node, context: Context): string {
+export default function writeClassDeclaration(_node: Node, context: Context): string {
   // We are sure the node is a ClassDeclaration
-  let classNode = node as ClassDeclaration;
+  let node = _node as ClassDeclaration;
 
   let apexCode: string = "";
   let name: string = "";
@@ -62,10 +62,10 @@ export default function writeClassDeclaration(node: Node, context: Context): str
   let isAbstract: boolean = false;
 
   // Get class name
-  name = classNode.getName() || "";
-  isAbstract = classNode.getAbstractKeyword() ? true : false;
+  name = node.getName() || "";
+  isAbstract = node.getAbstractKeyword() ? true : false;
 
-  classNode.getDecorators().forEach((decorator) => {
+  node.getDecorators().forEach((decorator) => {
     const decoratorName = decorator.getFullName().toLowerCase();
 
     if (decoratorName === "api") {
@@ -142,7 +142,7 @@ export default function writeClassDeclaration(node: Node, context: Context): str
   apexCode += " {\n";
 
   // Add all class members
-  const members = classNode.getInstanceProperties();
+  const members = node.getInstanceProperties();
   if (members.length) {
     members.forEach((member) => {
       apexCode += "  " + writePropertyDeclaration(member, context) + "\n";

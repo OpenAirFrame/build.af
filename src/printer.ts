@@ -1,4 +1,4 @@
-import { Project, ts, SourceFile, Node } from "ts-morph";
+import { Project, ts, SourceFile, Node, StringLiteral, NumericLiteral } from "ts-morph";
 import writeClassDeclaration from "./writers/wClassDeclaration";
 import Context from "./context";
 
@@ -8,6 +8,12 @@ export function printNode(node: Node, context: Context): string {
   const writerOutput: Array<String> = [];
 
   switch (node.getKindName()) {
+    case "StringLiteral":
+      writerOutput.push("'" + (node as StringLiteral).getLiteralValue() + "'");
+      break;
+    case "NumericLiteral":
+      writerOutput.push((node as NumericLiteral).getLiteralValue().toString());
+      break;
     case "ClassDeclaration":
       writerOutput.push(writeClassDeclaration(node, context));
       break;

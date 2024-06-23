@@ -1,11 +1,11 @@
 class DefaultPerson {
-  id: Id;
-  name: string = "";
+  id: ID;
+  name: string = "abc";
   age: integer = 0;
-  height: double = 0;
-  public pubicName: string = "";
+  height: double = 1000.5;
+  public publicName: string = "";
   private static privateAge: number = 0;
-  protected protectedNames: Array<string> = [];
+  protected protectedNames: Array<string>;
   static readonly staticAge: boolean = false;
 }
 
