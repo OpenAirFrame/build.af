@@ -1,0 +1,19 @@
+{
+  "name": "typescript-to-apex",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Greg 'Kingfisher' Thomson <thomsong@gmail.com> (https://github.com/thomsong)",
+  "private": false,
+  "scripts": {
+    "start": "ts-node src/index",
+    "test": "jest"
+  },
+  "dependencies": {
+    "ts-morph": "^22.0.0",
+    "typescript": "^5.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.8",
+    "ts-node": "^10.9.2"
+  }
+}
