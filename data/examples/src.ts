@@ -1,10 +1,12 @@
 class DefaultPerson {
-  name: string;
-  age: number;
-  public pubicName: string;
-  private static privateAge: number;
-  protected protectedNames: Array<string>;
-  static readonly staticAge: boolean;
+  id: Id;
+  name: string = "";
+  age: integer = 0;
+  height: double = 0;
+  public pubicName: string = "";
+  private static privateAge: number = 0;
+  protected protectedNames: Array<string> = [];
+  static readonly staticAge: boolean = false;
 }
 
 // @WithSharing

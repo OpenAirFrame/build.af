@@ -3,6 +3,7 @@ import { ApexClassModifier, ApexClassExtension } from "../apexDef";
 import Context from "../context";
 import { AbstractKeyword } from "@ts-morph/common/lib/typescript";
 import { error } from "console";
+import writePropertyDeclaration from "./wPropertyDeclaration";
 
 // import writePropertyDeclaration from "./wPropertyDeclaration";
 // import { printNode } from "../printer";
@@ -140,65 +141,13 @@ export default function writeClassDeclaration(node: Node, context: Context): str
   // Add opening body tag
   apexCode += " {\n";
 
-  // Get all class members
+  // Add all class members
   const members = classNode.getInstanceProperties();
   if (members.length) {
-    apexCode += "  // Members\n";
     members.forEach((member) => {
-      // if (member.getKindName() == "PropertyDeclaration") {
-      // TODO Move this out of this class
-      // TODO Decorators
-      // let modifier = modifier.getText();
-      let scope = "private";
-      let isStatic = false;
-      let isReadonly = false;
-
-      member.getModifiers().forEach((modifier) => {
-        const modifierName = modifier.getText().toLowerCase();
-        switch (modifierName) {
-          case "private":
-            scope = "private";
-            break;
-          case "protected":
-            scope = "protected";
-            break;
-          case "public":
-            scope = "public";
-            break;
-          case "static":
-            isStatic = true;
-            break;
-          case "readonly":
-            isReadonly = true;
-            break;
-          default:
-            throw error("Unsupported class member modifier: " + modifierName);
-        }
-      });
-
-      apexCode += "  " + scope + " " + member.getType().getText() + " " + member.getName() + ";\n";
-      // console.log("strig", member.getType().isString());
-      // console.log("number", member.getType().isNumber());
-      // console.log("kk1", member.getType().getText());
-
-      // } else {
-      //   throw error("Unsupported class member type: " + member.getKindName());
-      // }
+      apexCode += "  " + writePropertyDeclaration(member, context) + "\n";
     });
   }
-
-  // node.forEachChild((child) => {
-  // apexCode += printNode(child) + "\n";
-  // });
-
-  // node.members.forEach((member) => {
-  //   if (ts.isPropertyDeclaration(member)) {
-  //     apexCode += writePropertyDeclaration(member) + "\n";
-  //   } else {
-  //     // apexCode += printNode(member) + "\n";
-  //     apexCode += "TODO" + "\n";
-  //   }
-  // });
 
   // Add body with indentation
   apexCode += "  " + classBody.split("\n").join("\n  ");

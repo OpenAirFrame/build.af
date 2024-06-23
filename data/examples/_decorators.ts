@@ -32,7 +32,7 @@ function JsonAccess(SeeAllData: boolean) { return function (target: Function, _)
 @NamespaceAccessible
 @RestResource(urlMapping='/MyRestResource/*')
 @SuppressWarnings
-class DefaultPerson {
+class DefaultPersonx {
   name: String;
   age: number;
 }
