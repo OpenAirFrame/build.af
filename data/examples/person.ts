@@ -1,4 +1,4 @@
-class Person {
+class xPerson {
   name: string;
 
   constructor(name: string) {

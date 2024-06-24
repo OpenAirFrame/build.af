@@ -1,9 +1,10 @@
-import { Node, ClassDeclaration } from "ts-morph";
+import { Node, ClassDeclaration, ConstructorDeclaration } from "ts-morph";
 import { ApexClassModifier, ApexClassExtension } from "../apexDef";
 import Context from "../context";
 import { AbstractKeyword } from "@ts-morph/common/lib/typescript";
 import { error } from "console";
 import writePropertyDeclaration from "./wPropertyDeclaration";
+import { printNode } from "../printer";
 
 // import writePropertyDeclaration from "./wPropertyDeclaration";
 // import { printNode } from "../printer";
@@ -49,16 +50,15 @@ import writePropertyDeclaration from "./wPropertyDeclaration";
 */
 
 export default function writeClassDeclaration(_node: Node, context: Context): string {
-  // We are sure the node is a ClassDeclaration
   let node = _node as ClassDeclaration;
 
   let apexCode: string = "";
+  let apexBodyCode: string = "";
   let name: string = "";
   let modifier: ApexClassModifier = ApexClassModifier.Private;
   let extension: ApexClassExtension = ApexClassExtension.None;
   let interfaceClassNames: Array<string> = [];
   let extendingClassName: string = "";
-  let classBody: string = "\n// The body of the class";
   let isAbstract: boolean = false;
 
   // Get class name
@@ -140,19 +140,71 @@ export default function writeClassDeclaration(_node: Node, context: Context): st
 
   // Add opening body tag
   apexCode += " {\n";
+  context.blockLevel++;
 
   // Add all class members
-  const members = node.getInstanceProperties();
+  const members = node.getProperties();
   if (members.length) {
+    apexBodyCode += "// Class variables\n";
     members.forEach((member) => {
-      apexCode += "  " + writePropertyDeclaration(member, context) + "\n";
+      apexBodyCode += writePropertyDeclaration(member, context) + "\n";
     });
+    apexBodyCode += "\n";
   }
 
-  // Add body with indentation
-  apexCode += "  " + classBody.split("\n").join("\n  ");
+  const constructors = node.getConstructors();
+  if (constructors.length > 1) {
+    // Currently only support one constructor. Apex supports multiple constructors with overloading
+    throw Error("Class can only have one constructor");
+  } else if (constructors.length === 1) {
+    const constructor: ConstructorDeclaration = constructors[0];
+
+    /*
+      APEX SAMPLE
+      ----------------
+      // The no argument constructor 
+      public ClassName() {
+        // more code here
+      }
+      */
+    let parentNode = constructor.getParent() as ClassDeclaration;
+    let parentClassName = parentNode.getName() || "";
+    let methodApexCode: string = "";
+
+    methodApexCode += "// Class constructor\n";
+    methodApexCode += "public " + parentClassName + "(";
+
+    let constructorParams: Array<string> = [];
+    constructor.getParameters().map((param) => {
+      // TODO. Move out to a separate file
+      constructorParams.push(param.getText());
+    });
+
+    methodApexCode += constructorParams.join(", ");
+    methodApexCode += ")";
+
+    // methodApexCode += constructor.getText() + "\n";
+    const body = constructor.getBody();
+    if (body) {
+      methodApexCode += printNode(body, context);
+    } else {
+      methodApexCode += ";";
+    }
+
+    apexBodyCode += methodApexCode + "\n\n";
+  }
+
+  apexBodyCode += "// Class methods\n\n";
+
+  apexCode +=
+    "  ".repeat(context.blockLevel) +
+    apexBodyCode
+      .trim()
+      .split("\n")
+      .join("\n" + "  ".repeat(context.blockLevel));
 
   // Add closing body tag
+  context.blockLevel--;
   apexCode += "\n}\n";
 
   return apexCode;

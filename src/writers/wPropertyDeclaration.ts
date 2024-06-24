@@ -1,6 +1,6 @@
 import { ClassInstancePropertyTypes, ParameterDeclaration } from "ts-morph";
 import Context from "../context";
-import { printNode } from "../printer";
+import writeDeclaration from "./wDeclaration";
 /*
   Apex Docs
 
@@ -50,24 +50,21 @@ import { printNode } from "../printer";
 
 */
 export default function writePropertyDeclaration(
-  _member: ClassInstancePropertyTypes,
+  _property: ClassInstancePropertyTypes,
   context: Context
 ): string {
-  let member = _member as ParameterDeclaration;
+  let property = _property as ParameterDeclaration;
   let apexCode = "";
 
-  // if (member.getKindName() == "PropertyDeclaration") {
+  // if (property.getKindName() == "PropertyDeclaration") {
   // TODO Move this out of this class
   // TODO Decorators
   // let modifier = modifier.getText();
   let scope = "private";
   let isStatic = false;
   let isReadonly = false;
-  let type = member.getType().getText();
-  let name = member.getName();
-  let initialValue = null;
 
-  member.getModifiers().forEach((modifier) => {
+  property.getModifiers().forEach((modifier) => {
     const modifierName = modifier.getText().toLowerCase();
     switch (modifierName) {
       case "private":
@@ -86,68 +83,15 @@ export default function writePropertyDeclaration(
         isReadonly = true;
         break;
       default:
-        throw Error("Unsupported class member modifier: " + modifierName);
+        throw Error("Unsupported class property modifier: " + modifierName);
     }
   });
 
-  // Get initial value if it is set
-  const initializer = member.getInitializer();
-  if (initializer) {
-    // TODO: Parse the initializer
-    initialValue = printNode(initializer, context);
-  }
-
   apexCode += scope;
-  apexCode += " " + getApexType(type);
   apexCode += isReadonly ? " final" : "";
   apexCode += isStatic ? " static" : "";
-  apexCode += " " + name;
-
-  // Apex defaults to a null value for class properties
-  if (initialValue !== null) {
-    apexCode += " = ";
-    apexCode += initialValue;
-  }
-
+  apexCode += " " + writeDeclaration(property, context);
   apexCode += ";";
 
   return apexCode;
-}
-
-function getApexType(type: string): string {
-  // Trim array brackets
-  const rootType = type.replace("[]", "");
-  const arrayBrackets = type.substring(rootType.length);
-  let apexType = rootType;
-
-  switch (rootType.toLocaleLowerCase()) {
-    case "boolean":
-      apexType = "Boolean";
-      break;
-    case "string":
-      apexType = "String";
-      break;
-    case "number":
-      apexType = "Double";
-      break;
-    case "id":
-      apexType = "ID";
-      break;
-    case "decimal":
-      apexType = "Decimal";
-      break;
-    case "double":
-      apexType = "Double";
-      break;
-    case "integer":
-      apexType = "Integer";
-      break;
-    case "long":
-      apexType = "Long";
-      break;
-    default:
-    // Unknown type - no transformation
-  }
-
-  return apexType + arrayBrackets;
 }

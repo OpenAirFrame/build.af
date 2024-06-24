@@ -1,5 +1,14 @@
-import { Project, ts, SourceFile, Node, StringLiteral, NumericLiteral } from "ts-morph";
+import { SourceFile, Node, StringLiteral, NumericLiteral } from "ts-morph";
+
 import writeClassDeclaration from "./writers/wClassDeclaration";
+import writeExpressionStatement from "./writers/wExpressionStatement";
+import writeVariableStatement from "./writers/wVariableStatement";
+import writeBinaryExpression from "./writers/wBinaryExpression";
+import writeCallExpression from "./writers/wCallExpression";
+import writePropertyAccessExpression from "./writers/wPropertyAccessExpression";
+import writeBlock from "./writers/wBlock";
+import writeIdentifier from "./writers/wIdentifier";
+
 import Context from "./context";
 
 export function printNode(node: Node, context: Context): string {
@@ -14,9 +23,34 @@ export function printNode(node: Node, context: Context): string {
     case "NumericLiteral":
       writerOutput.push((node as NumericLiteral).getLiteralValue().toString());
       break;
+
+    case "Block":
+      writerOutput.push(writeBlock(node, context));
+      break;
+    case "Identifier":
+      writerOutput.push(writeIdentifier(node, context));
+      break;
+
     case "ClassDeclaration":
       writerOutput.push(writeClassDeclaration(node, context));
       break;
+    case "ExpressionStatement":
+      writerOutput.push(writeExpressionStatement(node, context));
+      break;
+    case "VariableStatement":
+      writerOutput.push(writeVariableStatement(node, context));
+      break;
+
+    case "BinaryExpression":
+      writerOutput.push(writeBinaryExpression(node, context));
+      break;
+    case "CallExpression":
+      writerOutput.push(writeCallExpression(node, context));
+      break;
+    case "PropertyAccessExpression":
+      writerOutput.push(writePropertyAccessExpression(node, context));
+      break;
+
     case "EndOfFileToken":
       // writerOutput.push("EOF");
       break;

@@ -2,6 +2,7 @@
 
 export default class Context {
   public apiVersion: number = 0;
+  public blockLevel: number = 0;
 
   // public checker: Context;
 
