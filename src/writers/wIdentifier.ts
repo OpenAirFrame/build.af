@@ -6,7 +6,11 @@ export default function writeIdentifier(_node: Node, context: Context): string {
 
   let apexCode: string = "";
 
-  apexCode += "Identifier: " + node.getFullText().trim();
+  // node.getImplementations().forEach((implementation) => {
+  // apexCode += "Identifier Implementation: " + implementation.getKind() + "\n";
+  // });
+
+  apexCode += node.getFullText().trim(); // "Identifier: " + node.getFullText().trim();
 
   return apexCode;
 }

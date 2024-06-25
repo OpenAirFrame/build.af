@@ -1,13 +1,16 @@
 import { SourceFile, Node, StringLiteral, NumericLiteral } from "ts-morph";
 
+import writeBinaryExpression from "./writers/wBinaryExpression";
+import writeBlock from "./writers/wBlock";
+import writeCallExpression from "./writers/wCallExpression";
 import writeClassDeclaration from "./writers/wClassDeclaration";
 import writeExpressionStatement from "./writers/wExpressionStatement";
-import writeVariableStatement from "./writers/wVariableStatement";
-import writeBinaryExpression from "./writers/wBinaryExpression";
-import writeCallExpression from "./writers/wCallExpression";
-import writePropertyAccessExpression from "./writers/wPropertyAccessExpression";
-import writeBlock from "./writers/wBlock";
 import writeIdentifier from "./writers/wIdentifier";
+import writeParenthesizedExpression from "./writers/wParenthesizedExpression";
+import writePropertyAccessExpression from "./writers/wPropertyAccessExpression";
+import writeVariableStatement from "./writers/wVariableStatement";
+import writePrefixUnaryExpression from "./writers/wPrefixUnaryExpression";
+import writePostfixUnaryExpression from "./writers/wPostfixUnaryExpression";
 
 import Context from "./context";
 
@@ -47,8 +50,20 @@ export function printNode(node: Node, context: Context): string {
     case "CallExpression":
       writerOutput.push(writeCallExpression(node, context));
       break;
+    case "ParenthesizedExpression":
+      writerOutput.push(writeParenthesizedExpression(node, context));
+      break;
+
     case "PropertyAccessExpression":
       writerOutput.push(writePropertyAccessExpression(node, context));
+      break;
+
+    case "PrefixUnaryExpression":
+      writerOutput.push(writePrefixUnaryExpression(node, context));
+      break;
+
+    case "PostfixUnaryExpression":
+      writerOutput.push(writePostfixUnaryExpression(node, context));
       break;
 
     case "EndOfFileToken":
