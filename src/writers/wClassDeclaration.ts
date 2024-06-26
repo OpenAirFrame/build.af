@@ -1,10 +1,11 @@
-import { Node, ClassDeclaration, ConstructorDeclaration } from "ts-morph";
+import { Node, ClassDeclaration, ConstructorDeclaration, HeritageClause } from "ts-morph";
 import { ApexClassModifier, ApexClassExtension } from "../apexDef";
 import Context from "../context";
-import { AbstractKeyword } from "@ts-morph/common/lib/typescript";
+import { AbstractKeyword, SyntaxKind } from "@ts-morph/common/lib/typescript";
 import { error } from "console";
 import writePropertyDeclaration from "./wPropertyDeclaration";
 import { printNode } from "../printer";
+import writeMethodDeclaration from "./wMethodDeclaration";
 
 // import writePropertyDeclaration from "./wPropertyDeclaration";
 // import { printNode } from "../printer";
@@ -55,7 +56,7 @@ export default function writeClassDeclaration(_node: Node, context: Context): st
   let apexCode: string = "";
   let apexBodyCode: string = "";
   let name: string = "";
-  let modifier: ApexClassModifier = ApexClassModifier.Private;
+  let modifier: ApexClassModifier = ApexClassModifier.Public;
   let extension: ApexClassExtension = ApexClassExtension.None;
   let interfaceClassNames: Array<string> = [];
   let extendingClassName: string = "";
@@ -65,6 +66,7 @@ export default function writeClassDeclaration(_node: Node, context: Context): st
   name = node.getName() || "";
   isAbstract = node.getAbstractKeyword() ? true : false;
 
+  // TODO: Top level classes must be public or global.
   node.getDecorators().forEach((decorator) => {
     const decoratorName = decorator.getFullName().toLowerCase();
 
@@ -106,7 +108,14 @@ export default function writeClassDeclaration(_node: Node, context: Context): st
   // interfaceClassNames.push("AnotherInterfaceName");
 
   // Class Extending Class
-  // extendingClassName = "AbstractClassName";
+  // TODO: This should be done better, and likely need to support more clause types
+  const HeritageClauses = node.getHeritageClauses();
+  if (HeritageClauses.length) {
+    const clause = HeritageClauses[0];
+    clause.getTypeNodes().forEach((typeNode) => {
+      extendingClassName = typeNode.getText();
+    });
+  }
 
   /*
      Start generating Apex code
@@ -122,8 +131,13 @@ export default function writeClassDeclaration(_node: Node, context: Context): st
 
   // Extension is optional
   if (extension !== ApexClassExtension.None) {
-    apexCode += " " + extension; // virtual | abstract | with sharing | without sharing
+    apexCode += " " + extension; // with sharing | without sharing | inherited sharing
   }
+
+  // Inheritance
+  // Assume virtual by default unless it has private constructor
+  // TODO: Check for constructor visibility
+  apexCode += " virtual"; // // virtual | abstract
 
   // Name is required
   apexCode += " class " + name;
@@ -158,43 +172,16 @@ export default function writeClassDeclaration(_node: Node, context: Context): st
     throw Error("Class can only have one constructor");
   } else if (constructors.length === 1) {
     const constructor: ConstructorDeclaration = constructors[0];
-
-    /*
-      APEX SAMPLE
-      ----------------
-      // The no argument constructor 
-      public ClassName() {
-        // more code here
-      }
-      */
-    let parentNode = constructor.getParent() as ClassDeclaration;
-    let parentClassName = parentNode.getName() || "";
-    let methodApexCode: string = "";
-
-    methodApexCode += "// Class constructor\n";
-    methodApexCode += "public " + parentClassName + "(";
-
-    let constructorParams: Array<string> = [];
-    constructor.getParameters().map((param) => {
-      // TODO. Move out to a separate file
-      constructorParams.push(param.getText());
-    });
-
-    methodApexCode += constructorParams.join(", ");
-    methodApexCode += ")";
-
-    // methodApexCode += constructor.getText() + "\n";
-    const body = constructor.getBody();
-    if (body) {
-      methodApexCode += printNode(body, context);
-    } else {
-      methodApexCode += ";";
-    }
-
-    apexBodyCode += methodApexCode + "\n\n";
+    apexBodyCode += "\n// Class constructor\n";
+    apexBodyCode += writeMethodDeclaration(constructor, context);
   }
 
-  apexBodyCode += "// Class methods\n\n";
+  apexBodyCode += "\n// Class methods\n";
+  // Add all class methods
+  const methods = node.getMethods();
+  methods.forEach((method) => {
+    apexBodyCode += printNode(method, context) + "\n";
+  });
 
   apexCode +=
     "  ".repeat(context.blockLevel) +

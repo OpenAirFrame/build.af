@@ -60,7 +60,7 @@ export default function writePropertyDeclaration(
   // TODO Move this out of this class
   // TODO Decorators
   // let modifier = modifier.getText();
-  let scope = "private";
+  let scope = "protected";
   let isStatic = false;
   let isReadonly = false;
 

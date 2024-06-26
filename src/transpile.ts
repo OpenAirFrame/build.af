@@ -1,5 +1,7 @@
-import { Project, ts } from "ts-morph";
+import { Project, SourceFile, ts } from "ts-morph";
 import { printApex } from "./printer";
+import Context from "./context";
+import { transformAST } from "./transform";
 
 export function ts2apex(path: string) {
   const project = new Project({
@@ -12,5 +14,11 @@ export function ts2apex(path: string) {
 
   const sourceFile = project.addSourceFileAtPath(path);
 
-  return printApex(sourceFile);
+  const context: Context = new Context();
+
+  transformAST(sourceFile, context);
+  console.log();
+  console.log();
+  console.log();
+  return printApex(sourceFile, context);
 }

@@ -4,7 +4,12 @@ import writeBinaryExpression from "./writers/wBinaryExpression";
 import writeBlock from "./writers/wBlock";
 import writeCallExpression from "./writers/wCallExpression";
 import writeClassDeclaration from "./writers/wClassDeclaration";
+import writeMethodDeclaration from "./writers/wMethodDeclaration";
+import writeFunctionDeclaration from "./writers/wFunctionDeclaration";
+
 import writeExpressionStatement from "./writers/wExpressionStatement";
+import writeReturnStatement from "./writers/wReturnStatement";
+
 import writeIdentifier from "./writers/wIdentifier";
 import writeNewExpression from "./writers/wNewExpression";
 import writeParenthesizedExpression from "./writers/wParenthesizedExpression";
@@ -54,11 +59,21 @@ export function printNode(node: Node, context: Context): string {
     case "ClassDeclaration":
       writerOutput.push(writeClassDeclaration(node, context));
       break;
+    case "MethodDeclaration":
+      writerOutput.push(writeMethodDeclaration(node, context));
+      break;
+    case "FunctionDeclaration":
+      writerOutput.push(writeFunctionDeclaration(node, context));
+      break;
+
     case "ExpressionStatement":
       writerOutput.push(writeExpressionStatement(node, context));
       break;
     case "VariableStatement":
       writerOutput.push(writeVariableStatement(node, context));
+      break;
+    case "ReturnStatement":
+      writerOutput.push(writeReturnStatement(node, context));
       break;
 
     case "BinaryExpression":
@@ -103,8 +118,7 @@ export function printNode(node: Node, context: Context): string {
   return writerOutput.join("\n");
 }
 
-export function printApex(sourceFile: SourceFile) {
-  const context: Context = new Context();
+export function printApex(sourceFile: SourceFile, context: Context) {
   // const x = sourceFile.getClassOrThrow("PublicPerson");
   // const props = x.getInstanceProperties();
 

@@ -34,7 +34,7 @@ export default function writeDeclaration(
   return apexCode;
 }
 
-function getApexType(type: string): string {
+export function getApexType(type: string): string {
   // Trim array brackets
   const rootType = type.replace("[]", "");
   const arrayBrackets = type.substring(rootType.length);
