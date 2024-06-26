@@ -1,88 +1,37 @@
-// id: ID;
-// age: integer = 0;
-// height: double = 1000.5;
-// public publicName: string = "";
-// private static privateAge: number = 0;
-// protected protectedNames: Array<string>;
-// static readonly staticAge: boolean = false;
-
-// let str0: string = "first";
-// let str1: string = "hello " + "world";
-// let str2: string = "default" + "_" + "name";
-let x = 0;
-let str0: string = "Add: " + (64 + x);
-let str1: string = "Sub: " + (64 - x++);
-let str3: string = "Div: " + 64 / 2 + x--;
-let str4: string = "Mul: " + ((64 * 2) / 1) * x++ * x++ * --x;
-let str5: string = "Mod: " + (-64 + 2);
-let str6: string = "Exp: " + 2 ** 3;
-
-console.log("Add: " + str0);
-console.log("Sub: " + str1);
-console.log("Div: " + str3);
-console.log("Mul: " + str4);
-console.log("Mod: " + str5);
-console.log("Exp: " + str6);
-
-// const a: number = 1,
-//   b: number = 5,
-//   c: number = 6;
-
-// class Person {
-//   readonly name: string = "default" + "_" + "name";
-//   age: number;
-// }
-/*
 class Person {
-  name: string = "default" + "_" + "name";
-  age: number;
+  name: string;
 
-  constructor(name: string, age: number = 0) {
-    this.name = name + "_name";
-    this.age = age + 5;
-    this.age -= 5;
+  constructor(name: string) {
+    this.name = name;
   }
 
-  greet(): void {
-    if (this.age) {
-      console.log("Hello " + this.name + ", aged " + this.age + "!");
-    } else {
-      console.log("Hello " + this.name + "!");
-    }
+  public greet_2(): string {
+    return "Hello 2, " + this.name;
   }
+
+  greet = (): string => {
+    return "Hello, " + this.name;
+  };
 }
 
-var i = 3;
+class Greg extends Person {
+  constructor() {
+    super("Greg");
+  }
 
-let a: number,
-  b: number = 5,
-  c: number = 6;
+  // greet(): string {
+  // return "Hello, Mr. " + this.name + " Thomson";
+  // }
+}
 
-const person: Person = new Person("King", 42);
-person.greet();
+// console.log("Jane: " + new Person("Jane").greet());
+// console.log("Greg: " + new Greg().greet());
 
-new Person("Queen").greet();
-console.log("Five " + (5 + 6) + " Six");
-
-// @WithSharing
-// @Private
-// @IsTest
-// abstract class PrivatePerson {
-//   name: string;
-//   age: number;
-// }
-
-// @IsTest
-// @InheritedSharing
-// class PublicPerson {
-//   name: string;
-//   age: number;
-// }
-
-// @Global
-// @WithoutSharing
-// class GlobalPerson {
-//   name: string;
-//   age: number;
-// }
-*/
+const tim: Person = new Person("Tim");
+console.log("Tim: " + tim.greet.abc());
+// const timGreet: Function = tim.greet;
+// console.log("Tim 1: " + timGreet());
+// const timGreet2: Function = tim.greet_2;
+// console.log("Tim 2: " + timGreet2.call(tim));
+// const timGreet3: Function = tim.greet_2;
+// console.log("Tim 3: " + timGreet2.toString());

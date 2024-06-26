@@ -28,7 +28,7 @@ class xPerson {
   };
 }
 
-class Greg extends Person {
+class xGreg extends Person {
   constructor() {
     super("Greg");
   }

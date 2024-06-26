@@ -33,6 +33,9 @@ export default function writeBinaryExpression(_node: Node, context: Context): st
     case "CaretToken":
       apexCode += left + " ^ " + right;
       break;
+    case "EqualsToken":
+      apexCode += left + " = " + right;
+      break;
 
     default:
       apexCode += left + " **" + node.getOperatorToken().getKindName() + "** " + right;

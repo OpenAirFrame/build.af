@@ -10,6 +10,6 @@ export default function writeExpressionStatement(_node: Node, context: Context):
   // Assume expression statement has one child based on AST examples so far
   const expression = node.getExpression();
   apexCode += printNode(expression, context);
-
+  apexCode += ";";
   return apexCode;
 }

@@ -6,11 +6,14 @@ import writeCallExpression from "./writers/wCallExpression";
 import writeClassDeclaration from "./writers/wClassDeclaration";
 import writeExpressionStatement from "./writers/wExpressionStatement";
 import writeIdentifier from "./writers/wIdentifier";
+import writeNewExpression from "./writers/wNewExpression";
 import writeParenthesizedExpression from "./writers/wParenthesizedExpression";
+
 import writePropertyAccessExpression from "./writers/wPropertyAccessExpression";
 import writeVariableStatement from "./writers/wVariableStatement";
 import writePrefixUnaryExpression from "./writers/wPrefixUnaryExpression";
 import writePostfixUnaryExpression from "./writers/wPostfixUnaryExpression";
+import writeArrowFunction from "./writers/wArrowFunction";
 
 import Context from "./context";
 
@@ -33,6 +36,20 @@ export function printNode(node: Node, context: Context): string {
     case "Identifier":
       writerOutput.push(writeIdentifier(node, context));
       break;
+    case "SuperKeyword":
+      writerOutput.push("super");
+      break;
+    case "ThisKeyword":
+      writerOutput.push("this");
+      break;
+
+    case "DotToken":
+      writerOutput.push(".");
+      break;
+
+    case "ArrowFunction":
+      writerOutput.push(writeArrowFunction(node, context));
+      break;
 
     case "ClassDeclaration":
       writerOutput.push(writeClassDeclaration(node, context));
@@ -52,6 +69,9 @@ export function printNode(node: Node, context: Context): string {
       break;
     case "ParenthesizedExpression":
       writerOutput.push(writeParenthesizedExpression(node, context));
+      break;
+    case "NewExpression":
+      writerOutput.push(writeNewExpression(node, context));
       break;
 
     case "PropertyAccessExpression":
